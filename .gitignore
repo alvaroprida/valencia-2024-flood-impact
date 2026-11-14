@@ -4,7 +4,9 @@ __pycache__/
 *.pyc
 data/raw/
 data/processed/
+models/
 tools/sfincs/
 tools/sfincs_image/
+tools/node22/
 node_modules/
 web/dist/

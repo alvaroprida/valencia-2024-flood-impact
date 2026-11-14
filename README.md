@@ -1,46 +1,66 @@
 # Valencia 2024 · Rapid flood impact mapping
 
-Case study of the 29 October 2024 DANA flash floods in Valencia (Horta Sud, Poyo, Magro, lower Turia):
-how much of a flash flood can be reconstructed from open satellite data, and how to fuse partial
-observations, rainfall and river gauges, and a hydrodynamic model into a maximum flood extent and
-depth layer, then into building and population impact and a response priority ranking.
+**[▶ Open the site](https://alvaroprida.github.io/valencia-2024-flood-impact/)**
 
-> **Work in progress.** Not an official hazard or damage map.
+Case study of the 29 October 2024 DANA flash floods in Valencia (Rambla del Poyo, Magro, Horta Sud, Ribera):
+what open satellite data can and cannot see of a flash flood, and how imagery, station rainfall and a
+hydrodynamic model (SFINCS) are combined into a flood extent and depth layer, then into building and
+population impact (Overture, WorldPop, JRC depth–damage curves) and a ranking of where to act first.
+Validated against Copernicus EMS activation EMSR773.
 
-## Findings so far
+> **Research case study, not an official hazard, damage or response map.** The site shows how every step
+> scores against the independent reference, including where it fails.
 
-| Source | Date | Result vs Copernicus EMS very-high-resolution flood outlines |
-|---|---|---|
-| Sentinel-1 SAR change detection | 1 and 6 Nov | Recall under 1%: water had drained before the first usable pass; false alarms in the Albufera rice paddies |
-| Sentinel-2 MNDWI | 31 Oct | Only 53% of the validated area is cloud-free; recall 8% on clear pixels |
-| Landsat 8 | 30 Oct | 99% cloud over the study area |
+## What the site shows
 
-Open optical and radar imagery each see only part of this flood, so the maximum extent and depth are
-reconstructed with a hydrodynamic model (SFINCS) forced by station rainfall, constrained by the partial
-observations and scored against Copernicus EMS activation EMSR773.
+| Tab | Content |
+|---|---|
+| **Overview** | Headline numbers and what the case study shows |
+| **Hazard → Approach & sources** | Which sources, why each is relevant, how they are combined |
+| **Hazard → Satellite evidence** | Sentinel-1 / Sentinel-2 flood detection scored against Copernicus EMS; why they fail for a flash flood |
+| **Hazard → Rainfall & gauges** | Rain and river gauges on the map; hourly rainfall from station totals (ERA5 for timing), cross-validated |
+| **Hazard → Flood model** | SFINCS rain-on-grid setup, calibration on Algemesí, held-out test on Horta Sud |
+| **Hazard → Flood extent & depth** | Modelled maximum depth with CEMS and satellite layers toggleable; building damage-grade check |
+| **Exposure** | Buildings and population, with data coverage and gap handling |
+| **Vulnerability** | JRC Europe depth–damage curves and a one-building calculator |
+| **Impact** | Flooded buildings coloured by damage, people, losses, roads cut, critical facilities |
+| **Prioritisation** | 250 m cells ranked by an adjustable score; stability under random weights |
+| **Method & sources** | Licences, assumptions, limitations, references |
 
-## Plan
+## How it is built
 
-Overview, Hazard, Exposure, Vulnerability, Impact, Prioritisation, with toggleable map layers (basins,
-rivers, river and rain gauges, flood extent and depth, buildings, population).
-
-## Pipeline
-
-Python in [`pipeline/`](pipeline); run from the repository root.
+The pipeline is Python in [`pipeline/`](pipeline), run from the repository root; it writes web layers to
+[`web/public/data/`](web/public/data). The site is a static React + TypeScript app (Vite, Tailwind, ECharts,
+MapLibre), deployed to GitHub Pages by [`deploy-pages.yml`](.github/workflows/deploy-pages.yml).
 
 | Script | Purpose |
 |---|---|
-| `00_search_scenes.py` | Sentinel-1 / Sentinel-2 scene availability around the event |
-| `01_inspect_cems.py` | Attributes of the downloaded EMSR773 layers |
-| `02_fetch_s1.py`, `03_fetch_dem.py` | Sentinel-1 RTC and Copernicus DEM onto a 10 m grid, slope, HAND |
-| `04_sar_flood.py` | SAR change detection and validation |
-| `05_optical.py`, `06_optical_flood.py` | Sentinel-2 / Landsat water index and validation |
-| `07_inspect_buildings.py` | Overture building attributes |
+| `00`–`07` | Scene search, Copernicus EMS reference, Sentinel-1 / Sentinel-2 / Landsat detection and validation |
+| `08`, `11`–`14` | AEMET stations, CHJ event report parsing, MITECO SAIH station layers, merged gauge layer |
+| `10`, `16` | FABDEM terrain, catchments and stream network |
+| `15`, `17` | ERA5 hourly timing; gauge-interpolated hourly rainfall field with leave-one-out test |
+| `18`, `19`, `25`, `26` | Land cover → roughness and curve number, SFINCS model builder, Albufera lake, calibration variants |
+| `09`, `tools/` | SFINCS image pull from Docker Hub and run under WSL1 (no Docker Desktop) |
+| `20`, `21`, `23` | Exposure (buildings, people), JRC depth–damage curves, impact |
+| `22` | SFINCS output → 30 m flood depth, scoring against CEMS |
+| `24` | Prioritisation |
+| `27`, `28` | Export web layers and the summary JSON |
 
-Raw and processed data are not committed (`data/` is ignored).
+```bash
+cd web
+npm ci
+npm run dev       # local preview
+npm run build     # static build in web/dist
+```
 
-## Data
+Raw and processed data, models and the Python environment are not committed.
 
-Copernicus Sentinel-1/2 and Copernicus DEM (via Microsoft Planetary Computer), Copernicus EMS EMSR773,
-Overture Maps buildings, WorldPop 2020 (constrained), AEMET and SAIH Júcar station data (planned).
-Follow each source's licence.
+## Data and licences
+
+Copernicus Sentinel-1/2, Landsat, Copernicus DEM and ESA WorldCover (via Microsoft Planetary Computer),
+Copernicus EMS EMSR773, FABDEM (CC BY-NC-SA 4.0, **non-commercial**), SAIH Júcar (CHJ) report, MITECO SAIH
+station layers, AEMET OpenData, ERA5 via Open-Meteo, Overture Maps (ODbL / CDLA), WorldPop (CC BY 4.0), JRC
+depth–damage functions. Full list and references on the *Method & sources* tab.
+AVAMET data was not used: its licence (CC BY-NC-ND) forbids derivatives.
+
+Site code: MIT licence. Data and figures follow the licences of their sources.
