@@ -46,8 +46,8 @@ export function FloodExtent({ data, palette, dark }: { data: SiteData; palette: 
         <div className="mt-4"><LayerMap layers={layers} bounds={FLOOD_BOUNDS} dark={dark} height={640}
           attribution="SFINCS · FABDEM · Copernicus EMS EMSR773 · Contains modified Copernicus Sentinel data 2024" /></div>
         <Info>
-          Turn on the CEMS outline (red) to compare. The model finds most of the observed flooding along the rivers, and floods too much of the flat ground in between:
-          it has no drainage network, and at 90 m it cannot resolve streets. Treat depth under about 0.5 m as an upper bound.
+          Turn on the CEMS outline (red) to compare. The model finds most of the flooding along the Magro and Júcar ({pct(cal.recall)} in Algemesí) but less in the dense Horta Sud streets
+          ({pct(val.recall)}), and floods too much of the flat ground in between: it has no drainage network, and at 90 m it cannot resolve streets. Treat depth under about 0.5 m as an upper bound.
         </Info>
       </Card>
 
@@ -71,11 +71,11 @@ export function FloodExtent({ data, palette, dark }: { data: SiteData; palette: 
       <Card title="Independent check on buildings" subtitle="Beyond the flood outline: the emergency service's building damage grades. (River-gauge peaks are not yet compared: the model has no discharge output points.)">
         <h3 className="text-sm font-semibold text-ink">Building damage grades (CEMS photo-interpretation, Horta Sud)</h3>
         <p className="mt-1 max-w-4xl text-sm text-ink-2">
-          CEMS graded individual buildings from very-high-resolution imagery. Modelled depth at those buildings should rise with the damage grade. It does.
+          CEMS graded individual buildings from very-high-resolution imagery. The share of those buildings that the model puts in flood water should rise with the damage grade: {['Possibly damaged', 'Damaged', 'Destroyed'].filter((g) => bv[g]).map((g) => `${pct(bv[g].share_modelled_flooded)} for ${g.toLowerCase()}`).join(', ')}.
         </p>
         <DataTable name="the grades" caption="Modelled depth at buildings by CEMS damage grade" head={['CEMS grade', 'Buildings', 'Median modelled depth m', 'Modelled as flooded']}
           rows={['Possibly damaged', 'Damaged', 'Destroyed'].filter((g) => bv[g]).map((g) => [g, n0(bv[g].n), bv[g].median_depth_m, pct(bv[g].share_modelled_flooded)])} />
-        <Info>Only about half of the buildings CEMS graded as damaged fall in modelled flooding (the street-scale misses), but the ordering is right and every building graded destroyed is in deep modelled water.</Info>
+        <Info>Fewer than half of the buildings CEMS graded as damaged fall in modelled flooding (the street-scale misses, so the median depth at them is 0 m), but the share rises with the grade, and every building graded destroyed is in deep modelled water.</Info>
       </Card>
     </div>
   )

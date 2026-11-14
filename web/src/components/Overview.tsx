@@ -49,7 +49,7 @@ export function Overview({ data, go, palette, dark }: { data: SiteData; go: (k: 
         <ol className="max-w-4xl list-decimal space-y-2 pl-5 text-sm leading-relaxed text-ink-2">
           <li><b className="text-ink">Open satellites cannot see a flash flood in time.</b> Sentinel-1 found {pct(s1.recall, 1)} of it (first pass three days after the peak, water gone, urban and orchard flooding invisible); Sentinel-2 was under cloud where it mattered; Landsat was cloud-covered.</li>
           <li><b className="text-ink">Station rainfall plus a hydrodynamic model fill the gap.</b> Gauges set the amounts, ERA5 the timing, SFINCS the water. It finds {pct(val.recall)} of the flood Copernicus EMS mapped in Horta Sud, an area it was not tuned on, but floods about {val.area_ratio_model_to_obs}× too much area.</li>
-          <li><b className="text-ink">Depth becomes impact.</b> Overture buildings, WorldPop people and JRC curves turn depth into damage; the result agrees with the emergency service's own building grades in ordering.</li>
+          <li><b className="text-ink">Depth becomes impact.</b> Overture buildings, WorldPop people and JRC curves turn depth into damage; the share of buildings modelled as flooded rises with the emergency service's own damage grades, and all those graded destroyed sit in deep water.</li>
           <li><b className="text-ink">Impact becomes a priority.</b> Cells are ranked by severity-weighted people, loss, flooded critical facilities and cut roads, with adjustable weights and a stability test.</li>
         </ol>
       </Card>
