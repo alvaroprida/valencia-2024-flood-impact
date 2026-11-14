@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+data/raw/
+data/processed/
+tools/sfincs/
+node_modules/
+web/dist/
