@@ -1,8 +1,10 @@
+.env
 .venv/
 __pycache__/
 *.pyc
 data/raw/
 data/processed/
 tools/sfincs/
+tools/sfincs_image/
 node_modules/
 web/dist/
